@@ -3,6 +3,7 @@ import { pool } from "../db.config.js";
 // User 데이터 삽입
 export const addUser = async (data) => {
   const conn = await pool.getConnection();
+  console.log("💾 addUser received:", data)
 
   try {
     const [confirm] = await pool.query(
@@ -15,7 +16,7 @@ export const addUser = async (data) => {
     }
 
     const [result] = await pool.query(
-      `INSERT INTO user (email, name, gender, birthday, address, detail_address, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+      `INSERT INTO user (email, name, gender, birthday, address, detail_address, phone_number, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
       [
         data.email,
         data.name,
@@ -24,6 +25,7 @@ export const addUser = async (data) => {
         data.address,
         data.detailAddress,
         data.phoneNumber,
+        data.password,
       ]
     );
 

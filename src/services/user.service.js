@@ -5,8 +5,11 @@ import {
   getUserPreferencesByUserId,
   setPreference,
 } from "../repositories/user.repository.js";
+import bcrypt from "bcrypt";
 
 export const userSignUp = async (data) => {
+  console.log("🧩 userSignUp input:", data)
+
   const joinUserId = await addUser({
     email: data.email,
     name: data.name,
@@ -15,6 +18,7 @@ export const userSignUp = async (data) => {
     address: data.address,
     detailAddress: data.detailAddress,
     phoneNumber: data.phoneNumber,
+    password: await bcrypt.hash(data.password, 7),
   });
 
   if (joinUserId === null) {
