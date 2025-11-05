@@ -14,30 +14,16 @@ export const bodyToUser = (body) => {
   };
 };
 
+
+
 export const responseFromUser = ({ user, preferences }) => {
-  const u = user[0];
+  const preferFoods = preferences.map(
+    (preference) => preference.foodCategory.name
+  );
 
   return {
-    success: true,
-    code: "S200",
-    message: "회원가입이 완료되었습니다.",
-    data: {
-      user: {
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        gender: u.gender,
-        birth: u.birth,
-        address: u.address,
-        detail_address: u.detail_address,
-        phone_number: u.phone_number,
-        created_at: u.created_at,
-      },
-      preferences: preferences.map((p) => ({
-        id: p.id,
-        food_id: p.food_id,
-        name: p.name,
-      })),
-    },
+    email: user.email,
+    name: user.name,
+    preferCategory: preferFoods,
   };
 };

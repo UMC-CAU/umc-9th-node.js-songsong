@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  BigInt              @id @default(autoincrement())
+  name                String?             @db.VarChar(20)
+  gender              Gender?
+  birth               DateTime?           @map("birthday") @db.DateTime(0)
+  address             String?             @db.Text
+  createdAt          DateTime?            @default(now()) @db.DateTime(6)
+  status              User_status?
+  email               String?             @db.Text
+  phoneNumber         String?             @map("phone_number") @db.Text
+  detailAddress       String?             @map("detail_address") @db.Text
+  password            String?             @db.Text
+  agreementStatus    AgreementStatus[]
+  userFavorCategories UserFavorCategory[]
+  missionStatus      MissionStatus[]
+
+  @@map("user")
+}
+
+model FoodCategory {
+  id                  BigInt              @id @default(autoincrement())
+  name                String?             @db.VarChar(20)
+  userFavorCategories UserFavorCategory[]
+
+  @@map("food")
+}
+
+model UserFavorCategory {
+  id             BigInt       @id @default(autoincrement())
+  createdAt     DateTime?     @map("created_at") @default(now()) @db.DateTime(6)
+  updatedAt     DateTime?     @map("updated_at") @default(now()) @db.DateTime(6)
+  foodCategoryId BigInt       @map("food_id")
+  userId         BigInt       @map("user_id")
+  foodCategory   FoodCategory @relation(fields: [foodCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "food_status_ibfk_1")
+  user           User         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "food_status_ibfk_2")
+
+  @@index([userId], map: "user_id")
+  @@index([foodCategoryId], map: "food_id")
+  @@map("food_status")
+}
+
+model Agreement {
+  id               BigInt             @id @default(autoincrement())
+  content          String?            @db.Text
+  agreed           Agreement_agreed?
+  agreementStatus AgreementStatus[]
+  @@map("agreement")
+}
+
+model AgreementStatus {
+  id           BigInt    @id @default(autoincrement())
+  createdAt   DateTime?  @map("created_at")@default(now()) @db.DateTime(6)
+  updatedAt   DateTime?  @map("updated_at")@default(now()) @db.DateTime(6)
+  agreementId BigInt     @map("agreement_id")
+  userId      BigInt     @map("user_id")
+  agreement    Agreement @relation(fields: [agreementId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "agreement_status_ibfk_1")
+  user         User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "agreement_status_ibfk_2")
+
+  @@index([agreementId], map: "agreement_id")
+  @@index([userId], map: "user_id")
+  @@map("agreement_status")
+}
+
+model District {
+  id         BigInt       @id @default(autoincrement())
+  name       String?      @db.VarChar(20)
+  restaurant Restaurant[]
+  @@map("district")
+}
+
+model Mission {
+  id             BigInt           @id @default(autoincrement())
+  content        String?          @db.Text
+  createdAt     DateTime?         @map("created_at")@default(now()) @db.DateTime(6)
+  updatedAt     DateTime?         @map("updated_at")@default(now()) @db.DateTime(6)
+  restaurantId  BigInt            @map("restaurant_id")
+  expireAt      DateTime?         @map("expire_at") @db.DateTime(6)
+  score          BigInt?
+  restaurant     Restaurant       @relation(fields: [restaurantId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mission_ibfk_1")
+  missionPhoto  MissionPhoto[]    
+  missionStatus MissionStatus[]   
+
+  @@index([restaurantId], map: "restaurant_id")
+  @@map("mission")
+}
+
+model MissionPhoto {
+  id         BigInt  @id @default(autoincrement())
+  content    String? @db.Text
+  missionId BigInt    @map("mission_id")
+  mission    Mission @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mission_photo_ibfk_1")
+
+  @@index([missionId], map: "mission_id")
+  @@map("mission_photo")
+}
+
+model MissionStatus {
+  id         BigInt                 @id @default(autoincrement())
+  status     MissionStatus_status?
+  createdAt DateTime?               @map("created_at") @default(now()) @db.DateTime(6)
+  updatedAt DateTime?               @map("updated_at") @default(now()) @db.DateTime(6)
+  missionId BigInt                  @map("mission_id")
+  userId    BigInt                  @map("user_id")
+  mission    Mission                @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mission_status_ibfk_1")
+  user       User                   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mission_status_ibfk_2")
+  review     Review[]
+
+  @@index([missionId], map: "mission_id")
+  @@index([userId], map: "user_id")
+  @@map("mission_status")
+}
+
+model Restaurant {
+  id          BigInt    @id @default(autoincrement())
+  name        String?   @db.VarChar(20)
+  districtId BigInt     @map("district_id")
+  createdAt  DateTime?  @map("created_at") @default(now()) @db.DateTime(6)
+  updatedAt  DateTime?  @map("updated_at") @default(now()) @db.DateTime(6)
+  mission     Mission[]
+  district    District  @relation(fields: [districtId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_ibfk_1")
+
+  @@index([districtId], map: "district_id")
+  @@map("restaurant")
+}
+
+model Review {
+  id                BigInt         @id @default(autoincrement())
+  createdAt        DateTime?        @map("created_at") @default(now()) @db.DateTime(6)
+  updatedAt        DateTime?      @map("updated_at") @default(now()) @db.DateTime(6)
+  content           String?        @db.Text
+  missionStatusId BigInt          @map("mission_status_id")
+  missionStatus    MissionStatus  @relation(fields: [missionStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_ibfk_1")
+  reviewPhoto      ReviewPhoto[]
+
+  @@index([missionStatusId], map: "mission_status_id")
+  @@map("review")
+}
+
+model ReviewPhoto {
+  id        BigInt  @id @default(autoincrement())
+  content   String? @db.Text
+  reviewId BigInt   @map("reiew_id")
+  review    Review  @relation(fields: [reviewId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "review_photo_ibfk_1")
+
+  @@index([reviewId], map: "review_id")
+  @@map("review_photo")
+}
+
+enum Gender {
+  M
+  F
+}
+
+enum MissionStatus_status {
+  ON_GOING
+  SUCCESS
+}
+
+enum Agreement_agreed {
+  Y
+  N
+}
+
+enum User_status {
+  ACTIVE
+  DEACTIVATED
+}

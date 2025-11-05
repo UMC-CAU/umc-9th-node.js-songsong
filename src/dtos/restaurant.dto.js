@@ -19,3 +19,14 @@ export const responseFromRestaurant = (restaurant, restaurantId)=>{
         }
     }
 }
+
+export const responseFromReviews = (reviews)=>{
+    return{
+        success: true,
+        code: "S200",
+        data: reviews,
+        pagination:{
+            cursor: reviews.length? reviews[reviews.length-1].id : null,
+        },
+    }
+}

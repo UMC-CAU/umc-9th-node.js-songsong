@@ -12,3 +12,4 @@ export const handleCreateReview = async(req, res, next)=>{
     const review = await createReview(reviewData)
     res.status(StatusCodes.OK).json({result:review})
 }
+

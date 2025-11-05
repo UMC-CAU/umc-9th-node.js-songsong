@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* File Layout */
+    "rootDir": "src",             // 소스 폴더
+    "outDir": "dist",             // 빌드 결과물 폴더
+
+    /* Environment Settings */
+    "target": "ES2020",
+    "module": "ESNext",           // ✅ ESM 프로젝트이므로 ESNext 유지
+    "moduleResolution": "node",   // Node-style import 해석
+    "lib": ["ESNext"],
+    "types": ["node"],            // Node 환경 타입 로딩 (process, __dirname 등)
+
+    /* Other Outputs */
+    "sourceMap": true,
+    "declaration": false,         // 배포 시 .d.ts 파일 불필요
+    "skipLibCheck": true,
+
+    /* Type Checking */
+    "strict": true,
+    "esModuleInterop": true,      // import express from "express" 가능하게
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,              // ✅ 기존 JS 파일도 허용
+    "checkJs": false,
+
+    /* Module behavior */
+    "resolveJsonModule": true,    // JSON import 허용
+    "isolatedModules": true       // ts-node 실행 시 필요
+  },
+  "include": ["src/**/*"]
+}
+
