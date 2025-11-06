@@ -9,7 +9,6 @@ export const bodyToReview=(body, missionId)=>{
 }
 
 export const responseFromReview=(review)=>{
-    const r = review[0]
     return{
         success:true,
         code:"S200",

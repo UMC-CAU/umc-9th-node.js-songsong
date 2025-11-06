@@ -18,7 +18,7 @@ export const createRestaurant = async(data:any)=>{
 //repository함수 총 3개 호출 필요.. 1. data(=restaurantID)로 mission테이블에서 mission Id검색 : getMissionIdByRestaurantId
 //2. mission ID로 mission_status 테이블에서 mission_status_id검색 : getMissionStatusIdByMissionId
 //3. review테이블에서 mission_status_id가진 리뷰 쫙 검색. : getReviewsByMissionStatusId
-export const listRestaurantReviews = async(data:any, cursor:Number)=>{
+export const listRestaurantReviews = async(data:any, cursor:number)=>{
     const missionId = await getMissionIdByRestaurantId(data)
     const missionStatusId = await getMissionStatusIdByMissionId(missionId)
     const reviews = await getReviewsByMissionStatusId(missionStatusId, cursor)

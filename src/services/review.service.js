@@ -2,8 +2,8 @@
 //repository함수로는 입력받은 데이터를 리뷰 테이블에 넣는 addReview(id리턴), 리뷰 정보를 가져오는 getReview, missionStatusId에 대한 missionId를 찾는 getMissionId
 
 import {bodyToReview, responseFromReview} from "../dtos/review.dto.js"
-import {addReview, getReview, getMissionStatusId} from "../repositories/review.repository.js"
-
+import { addReview, getReview, getMissionStatusId} from "../repositories/review.repository.js"
+import {checkChallengeStatus} from "../repositories/mission.repository.js"
 
 export const createReview = async (data) => {
     console.log("서비스 진입")
@@ -15,18 +15,14 @@ export const createReview = async (data) => {
     if(!missionStatusId){
         throw new Error("해당 미션에 참여한 기록이 없습니다.")
     }
-    const reviewId=await addReview({
-        content : data.content,
-        missionStatusId
+    if (checkChallengeStatus(missionStatusId)){
+        const reviewId = await addReview({
+            content : data.content,
+            missionStatusId
+        
     })
-    
-    if (!reviewId){
-        throw new Error("리뷰 생성에 실패했습니다.")
+        const review=await getReview(reviewId)
+        return responseFromReview(review)
     }
-    //이제 addReview를 했으면.. 리뷰테이블에 미션이 들어가있게 된다.
-    //그럼 이제 리턴값 반환
-
-    const review = await getReview(reviewId)
-
-    return responseFromReview(review)
+    else throw new Error("미션을 완수해야 리뷰를 작성할 수 있습니다.")
 }
