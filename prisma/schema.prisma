@@ -13,7 +13,7 @@ model User {
   gender              Gender?
   birth               DateTime?           @map("birthday") @db.DateTime(0)
   address             String?             @db.Text
-  createdAt          DateTime?            @default(now()) @db.DateTime(6)
+  createdAt          DateTime?            @map("created_at")@default(now()) @db.DateTime(6)
   status              User_status?
   email               String?             @db.Text
   phoneNumber         String?             @map("phone_number") @db.Text

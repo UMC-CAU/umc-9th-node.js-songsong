@@ -7,8 +7,8 @@ export const bodyToUser = (body) => {
     gender: body.gender, // 필수
     birth, // 필수
     address: body.address || "", //선택 
-    detailAddress: body.detail_address || "", //선택 
-    phoneNumber: body.phone_number,//필수
+    detailAddress: body.detailAddress || "", //선택 
+    phoneNumber: body.phoneNumber,//필수
     preferences: body.preferences,// 필수 
     password: body.password || "", //일단 비밀번호는 선택으로..
   };

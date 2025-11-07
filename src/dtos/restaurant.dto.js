@@ -1,9 +1,9 @@
 
 
-export const bodyToRestaurant=(body, restaurantId)=>{
+export const bodyToRestaurant=(body, districtId)=>{
     return {
         name : body.name,
-        districtId : body.districtId,
+        districtId,
     }
 }
 

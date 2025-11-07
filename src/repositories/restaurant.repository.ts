@@ -8,7 +8,7 @@ export const addRestaurant = async(data:Record<string, any>)=>{
             districtId : data.districtId
         },
     })
-    return BigInt(result.id)
+    return Number(result.id)
 }
 
 //restaurantId가진 미션Id여럿 검색

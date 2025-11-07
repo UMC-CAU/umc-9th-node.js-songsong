@@ -20,5 +20,5 @@ export const createChallenge = async (data) => {
   const challenge = await getChallenge(challengeId);
 
   // 응답 DTO 변환
-  return responseFromChallenge({ ...challenge, missionStatusId: challengeId });
+  return responseFromChallenge({ id: Number(challenge.id), userid: Number(challenge.userId), missionId: Number(challenge.missionId), status:challenge.status });
 };
