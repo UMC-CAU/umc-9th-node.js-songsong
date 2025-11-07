@@ -1,7 +1,8 @@
 //리포지토리 함수 임포트 필요: addRestaurant(insert)
 import {addRestaurant, getMissionIdByRestaurantId, getMissionStatusIdByMissionId, getReviewsByMissionStatusId} from "../repositories/restaurant.repository.js"
 import {responseFromRestaurant, responseFromReviews} from "../dtos/restaurant.dto.js"
-
+import {responseFromMissions} from "../dtos/mission.dto.js"
+import {getMissionsByRestaurantId} from "../repositories/mission.repository.js"
 export const createRestaurant = async(data:any)=>{
     const restaurantId = await addRestaurant({
         name: data.name,
@@ -23,4 +24,10 @@ export const listRestaurantReviews = async(data:any, cursor:number)=>{
     const missionStatusId = await getMissionStatusIdByMissionId(missionId)
     const reviews = await getReviewsByMissionStatusId(missionStatusId, cursor)
     return responseFromReviews(reviews)
+}
+
+// 필요한 repository함수는.. mission테이블에서 restaurantId 검색하는 함수 하나. getMissionsByRestaurantId
+export const listRestaurantMissions = async(restaurantId:number, cursor:number)=>{
+    const missions = await getMissionsByRestaurantId(restaurantId, cursor)
+    return responseFromMissions(missions)
 }

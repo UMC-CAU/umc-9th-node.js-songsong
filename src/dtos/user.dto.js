@@ -27,3 +27,14 @@ export const responseFromUser = ({ user, preferences }) => {
     preferCategory: preferFoods,
   };
 };
+
+export const responseFromUserReviews=(reviews)=>{
+  return{
+    succeess:true,
+    code:"S200",
+    data:reviews,
+    pagination:{
+      cursor: reviews.length?reviews[reviews.length-1].id:null,
+    },
+  }
+}

@@ -43,3 +43,37 @@ export const getUserPreferencesByUserId = async (userId:number) => {
 
   return preferences;
 };
+
+export const getMissionStatusIdByUserId = async(userId:number)=>{
+  const missionStatusIds = await prisma.missionStatus.findMany({
+    select:{
+      id: true,
+    },
+    where:{
+      userId:BigInt(userId)
+    }
+  })
+  return missionStatusIds.map(ms => ms.id);
+}
+export const getUserReviews = async(missionStatusIds:bigint[], cursor:number)=> {
+  console.log(missionStatusIds)
+  const reviews = await prisma.review.findMany({
+    where:{
+      missionStatusId:{
+        in: missionStatusIds,
+      },
+      id:{gt:cursor}
+    },
+    orderBy:{id:"asc"},
+    take:5
+  }
+  )
+  
+  const serealized = reviews.map((r)=>({
+    ...r,
+    id:Number(r.id),
+    missionStatusId: Number(r.id),
+  }))
+    
+  return serealized
+}

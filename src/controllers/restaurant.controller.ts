@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import {bodyToRestaurant} from "../dtos/restaurant.dto.js"
-import {createRestaurant, listRestaurantReviews} from "../services/restaurant.service.js"
+import {createRestaurant, listRestaurantReviews, listRestaurantMissions} from "../services/restaurant.service.js"
 import type { Request, Response } from "express";
 
 
@@ -21,12 +21,21 @@ export const handleCreateRestaurant=async(req:Request, res:Response, next:any)=>
 */
 export const handleListRestaurantReviews=async(req:Request, res:Response, next:any)=>{
     console.log("가게에 추가된 리뷰 목록 조회를 요청했습니다.")
-    console.log("raw query:", req.query);
 
     const reviews = await listRestaurantReviews( 
         Number(req.params.restaurantId),
         typeof req.query.cursor === "string"? Number(req.query.cursor) : 0    
     )
     res.status(StatusCodes.OK).json({result:reviews})
-    
+}
+
+export const handleListRestaurantMissions=async(req:Request, res:Response, next:any)=>{
+    console.log("가게의 모든 미션 목록 조회를 요청했습니다.")
+
+    const missions = await listRestaurantMissions(
+        Number(req.params.restaurantId),
+        typeof req.query.cursor === "string"? Number(req.query.cursor) : 0
+    )
+    res.status(StatusCodes.OK).json({result:missions})
+
 }

@@ -35,6 +35,7 @@ export const getChallenge = async (challengeId:number) => {
 
 //특정 유저가 이미 해당 미션에 도전 중인지 확인
 export const checkChallengeStatus = async (data:Record<string, any>) => {
+  console.log(`data:${data}`)
   const result = await prisma.missionStatus.findFirst({
     select:{
       id: true,
@@ -47,3 +48,56 @@ export const checkChallengeStatus = async (data:Record<string, any>) => {
   })
   return result||null
 };
+
+export const getMissionsByRestaurantId = async(id:number, cursor:number)=>{
+  const missions = await prisma.mission.findMany({
+    where:{
+      restaurantId : id,
+      id:{gt:cursor}
+    },
+    orderBy:{id:"asc"},
+    take:5
+  })
+
+  const serealized = missions.map((m)=>({
+    ...m,
+    id: Number(m.id),
+    restaurantId: Number(m.restaurantId),
+    score: Number(m.score)
+  }))
+
+  return serealized
+
+}
+
+export const alterMissionStatus = async(userId:number, missionId:number, changedStatus:Record<string, any>)=>{
+  await prisma.missionStatus.updateMany({
+    where:{
+      userId:BigInt(userId),
+      missionId:BigInt(missionId)
+    },
+    data:{
+      status:changedStatus.status as any
+    }
+  })
+}
+
+export const getMission = async(userId:number, missionId:number)=>{
+  const result = await prisma.missionStatus.findFirst({
+    where:{
+      userId:BigInt(userId),
+      missionId:BigInt(missionId)
+    },
+  })
+  if(result!=null){
+  const serialized = {
+    ...result,
+    userId: Number(result.userId),
+    missionId: Number(result.missionId),
+    id: Number(result.id)
+
+  }
+  return serialized}
+
+  return null
+}

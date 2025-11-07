@@ -1,14 +1,15 @@
-import { responseFromUser } from "../dtos/user.dto.js";
+import { responseFromUser, responseFromUserReviews } from "../dtos/user.dto.js";
 import {
   addUser,
   getUser,
   getUserPreferencesByUserId,
   setPreference,
+  getMissionStatusIdByUserId,
+  getUserReviews
 } from "../repositories/user.repository.js";
 import bcrypt from "bcrypt";
 
 export const userSignUp = async (data) => {
-  console.log("🧩 userSignUp input:", data)
 
   const joinUserId = await addUser({
     email: data.email,
@@ -34,3 +35,10 @@ export const userSignUp = async (data) => {
 
   return responseFromUser({ user, preferences });
 };
+
+export const listUserReviews = async(userId, cursor)=>{
+  const reviews = await getUserReviews(await getMissionStatusIdByUserId(userId), cursor)
+
+  return responseFromUserReviews(reviews)
+
+}

@@ -114,6 +114,7 @@ model MissionStatus {
   user       User                   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mission_status_ibfk_2")
   review     Review[]
 
+  @@unique([userId, missionId])
   @@index([missionId], map: "mission_id")
   @@index([userId], map: "user_id")
   @@map("mission_status")

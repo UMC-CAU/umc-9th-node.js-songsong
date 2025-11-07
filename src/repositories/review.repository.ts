@@ -3,7 +3,7 @@
 //addReview({ content, missionStatusId })	review 테이블에 insert
 //getReview(reviewId)	review 테이블에서 row 조회
 
-import { pool } from "../db.config.js";
+
 import {prisma} from "../db.config.js"
 
 
