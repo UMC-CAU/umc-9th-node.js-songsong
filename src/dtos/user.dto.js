@@ -30,7 +30,7 @@ export const responseFromUser = ({ user, preferences }) => {
 
 export const responseFromUserReviews=(reviews)=>{
   return{
-    succeess:true,
+    success:true,
     code:"S200",
     data:reviews,
     pagination:{
