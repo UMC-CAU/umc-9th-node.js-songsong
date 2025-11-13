@@ -69,11 +69,11 @@ export const getUserReviews = async(missionStatusIds:bigint[], cursor:number)=> 
   }
   )
   
-  const serealized = reviews.map((r)=>({
+  const serialized = reviews.map((r)=>({
     ...r,
     id:Number(r.id),
     missionStatusId: Number(r.id),
   }))
     
-  return serealized
+  return serialized
 }

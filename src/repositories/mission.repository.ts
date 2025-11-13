@@ -59,14 +59,14 @@ export const getMissionsByRestaurantId = async(id:number, cursor:number)=>{
     take:5
   })
 
-  const serealized = missions.map((m)=>({
+  const serialized = missions.map((m)=>({
     ...m,
     id: Number(m.id),
     restaurantId: Number(m.restaurantId),
     score: Number(m.score)
   }))
 
-  return serealized
+  return serialized
 
 }
 
