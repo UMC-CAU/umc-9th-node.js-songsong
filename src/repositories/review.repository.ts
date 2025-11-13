@@ -60,7 +60,6 @@ export const getReview = async (reviewId:number) => {
     select:{
       id: true,
       content: true,
-      missionStatus: true,
     },
     where:{id: BigInt(reviewId)},
   })

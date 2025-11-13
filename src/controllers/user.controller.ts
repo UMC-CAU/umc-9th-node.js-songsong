@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { bodyToUser } from "../dtos/user.dto.js";
 import { userSignUp, listUserReviews } from "../services/user.service.js";
-import type {Response, Request, NextFunction} from "express"
+import type {Response, Request, NextFunction} from "express";
 
 export const handleUserSignUp = async (req:Request, res:Response, next:NextFunction) => {
   console.log("회원가입을 요청했습니다!");
@@ -12,13 +12,13 @@ export const handleUserSignUp = async (req:Request, res:Response, next:NextFunct
 };
 
 export const handleListUserReviews = async(req:Request, res:Response, next:NextFunction)=>{
-    console.log("리뷰 목록 조회를 요청했습니다.")
+    console.log("리뷰 목록 조회를 요청했습니다.");
 
-    const {userId} = req.params
+    const {userId} = req.params;
     const reviews = await listUserReviews(
       Number(userId), 
       typeof req.query.cursor === "string"? Number(req.query.cursor) : 0 
-    )
-    res.status(StatusCodes.OK).json({result:reviews})
+    );
+    (res as any).status(StatusCodes.OK).success(reviews);
       
 }

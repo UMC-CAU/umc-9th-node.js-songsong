@@ -8,7 +8,7 @@ import {
   getUserReviews
 } from "../repositories/user.repository.js";
 import bcrypt from "bcrypt";
-import {DuplicateUserEmailError} from "../errors.ts"
+import {DuplicateUserEmailError, ReviewNotExistError} from "../errors.ts"
 
 export const userSignUp = async (data) => {
 
@@ -39,6 +39,9 @@ export const userSignUp = async (data) => {
 
 export const listUserReviews = async(userId, cursor)=>{
   const reviews = await getUserReviews(await getMissionStatusIdByUserId(userId), cursor)
+  if(reviews.length==0){
+    throw new ReviewNotExistError("해당 유저가 작성한 리뷰가 없습니다.", {userId:userId})
+  }
 
   return responseFromUserReviews(reviews)
 

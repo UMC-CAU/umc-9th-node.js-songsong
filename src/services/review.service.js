@@ -4,6 +4,7 @@
 import {bodyToReview, responseFromReview} from "../dtos/review.dto.js"
 import { addReview, getReview, getMissionStatusId} from "../repositories/review.repository.js"
 import {checkChallengeStatus} from "../repositories/mission.repository.js"
+import { HasNotFinishedMissionError, HasNotJoinedMissionError } from "../errors.js"
 
 export const createReview = async (data) => {
     console.log("서비스 진입")
@@ -13,9 +14,9 @@ export const createReview = async (data) => {
         missionId : data.missionId
     })
     if(!missionStatusId){
-        throw new Error("해당 미션에 참여한 기록이 없습니다.")
+        throw new HasNotJoinedMissionError("해당 미션에 참여한 기록이 없습니다.", data) //HasNotJoinedMissionError
     }
-    if (checkChallengeStatus(missionStatusId)){
+    if (await checkChallengeStatus(missionStatusId)){
         const reviewId = await addReview({
             content : data.content,
             missionStatusId
@@ -24,5 +25,5 @@ export const createReview = async (data) => {
         const review=await getReview(reviewId)
         return responseFromReview(review)
     }
-    else throw new Error("미션을 완수해야 리뷰를 작성할 수 있습니다.")
+    else throw new HasNotFinishedMissionError("미션을 완수해야 리뷰를 작성할 수 있습니다.", data) //HasNotFinishedMissionError
 }
