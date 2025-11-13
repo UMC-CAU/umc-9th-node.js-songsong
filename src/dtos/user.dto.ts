@@ -1,4 +1,4 @@
-export const bodyToUser = (body) => {
+export const bodyToUser = (body:Record<string, any>) => {
   const birth = new Date(body.birth); //날짜 변환
 
   return {
@@ -16,23 +16,21 @@ export const bodyToUser = (body) => {
 
 
 
-export const responseFromUser = ({ user, preferences }) => {
+export const responseFromUser = ({ user, preferences }:Record<string, any>) => {
   const preferFoods = preferences.map(
-    (preference) => preference.foodCategory.name
+    (preference:Record<string, any>) => preference.foodCategory.name
   );
 
   return {
-    email: user.email,
-    name: user.name,
-    preferCategory: preferFoods,
+      ...user,
+      id:Number(user.id),
+      preferCategory: preferFoods,
   };
 };
 
-export const responseFromUserReviews=(reviews)=>{
+export const responseFromUserReviews=(reviews:Record<string, any>)=>{
   return{
-    success:true,
-    code:"S200",
-    data:reviews,
+    reviews,
     pagination:{
       cursor: reviews.length?reviews[reviews.length-1].id:null,
     },

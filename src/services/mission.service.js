@@ -1,5 +1,6 @@
 import { addChallenge, getChallenge, checkChallengeStatus, alterMissionStatus, getMission } from "../repositories/mission.repository.js";
 import { responseFromChallenge, responseFromChangedMission } from "../dtos/mission.dto.js";
+import {MissionAlreadyChallengedError, ReviewNotExistError, MissionAlreadyFinishedError, UndefinedMissionStatusError} from "../errors.js";
 
 export const createChallenge = async (data) => {
   // 중복 확인
@@ -7,7 +8,7 @@ export const createChallenge = async (data) => {
     missionId: data.missionId,
     userId: data.userId
   });
-  if (existing) throw new Error("이미 도전 중인 미션입니다.");
+  if (existing) throw new MissionAlreadyChallengedError("이미 도전 중인 미션입니다.", data); //MissionAlreadyCheallengedError
 
   // mission_status 추가
   const challengeId = await addChallenge({
@@ -28,12 +29,12 @@ export const createChallenge = async (data) => {
 export const changeMissionStatus = async(userId, missionId, changedStatus)=>{
   const result = await checkChallengeStatus({userId, missionId})
   console.log(result)
-  if(result==null) throw new Error("존재하지 않는 리뷰입니다.")
-  else if(result.status=="SUCCESS") throw new Error("이미 완료한 미션입니다.")
+  if(result==null) throw new ReviewNotExistError("존재하지 않는 리뷰입니다.", {userId, missionId}) //ReviewNotExistError
+  else if(result.status=="SUCCESS") throw new MissionAlreadyFinishedError("이미 완료한 미션입니다.", {userId, missionId, result}) //MissionAlreadyFinishedError
   else if(result.status=="ON_GOING") {
     alterMissionStatus(userId, missionId, changedStatus)
     const modifiedResult = await getMission(userId, missionId)
     return responseFromChangedMission(modifiedResult)
   }
-  else throw new Error(`정의되지 않은 status입니다. : ${result.status}`)
+  else throw new UndefinedMissionStatusError("정의되지 않은 status입니다.", changedStatus) //UdefinedMissionStatusError
 }
