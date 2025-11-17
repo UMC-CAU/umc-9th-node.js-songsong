@@ -9,6 +9,8 @@ import {handleCreateRestaurant, handleListRestaurantReviews, handleListRestauran
 import type { NextFunction, Request, Response, } from "express"
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
+import swaggerAutogen from "swagger-autogen";
+import swaggerUiExpress from "swagger-ui-express";
 
 
 
@@ -24,6 +26,37 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(morgan('dev'))
 app.use(cookieParser())
+
+app.use(
+  "/docs",
+  swaggerUiExpress.serve,
+  swaggerUiExpress.setup({}, {
+    swaggerOptions: {
+      url: "/openapi.json",
+    },
+  })
+);
+
+app.get("/openapi.json", async (req, res, next) => {
+  // #swagger.ignore = true
+  const options = {
+    openapi: "3.1.0",
+    disableLogs: true,
+    writeOutputFile: false,
+  };
+  const outputFile = "/dev/null"; // 파일 출력은 사용하지 않습니다.
+  const routes = ["./src/index.ts"];
+  const doc = {
+    info: {
+      title: "UMC 9th",
+      description: "UMC 9th Node.js 테스트 프로젝트입니다.",
+    },
+    host: "localhost:3000",
+  };
+
+  const result = await swaggerAutogen(options)(outputFile, routes, doc);
+  res.json(result ? result.data : null);
+});
 
 /*
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
