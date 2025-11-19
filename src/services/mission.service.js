@@ -28,11 +28,11 @@ export const createChallenge = async (data) => {
 //repository2. alterMissionStatus(userId, missionId, changedStatus) => changedStatus로 바꿈
 export const changeMissionStatus = async(userId, missionId, changedStatus)=>{
   const result = await checkChallengeStatus({userId, missionId})
-  console.log(result)
-  if(result==null) throw new ReviewNotExistError("존재하지 않는 리뷰입니다.", {userId, missionId}) //ReviewNotExistError
-  else if(result.status=="SUCCESS") throw new MissionAlreadyFinishedError("이미 완료한 미션입니다.", {userId, missionId, result}) //MissionAlreadyFinishedError
+  console.log(result.status)
+  if(result==null) throw new ReviewNotExistError("존재하지 않는 리뷰입니다.", {userId:Number(result.userId), missionId:Number(result.missionId)}) //ReviewNotExistError
+  else if(result.status=="SUCCESS") throw new MissionAlreadyFinishedError("이미 완료한 미션입니다.", {userId:Number(result.userId), missionId:Number(result.missionId), status:result.status}) //MissionAlreadyFinishedError
   else if(result.status=="ON_GOING") {
-    alterMissionStatus(userId, missionId, changedStatus)
+    await alterMissionStatus(userId, missionId, changedStatus)
     const modifiedResult = await getMission(userId, missionId)
     return responseFromChangedMission(modifiedResult)
   }

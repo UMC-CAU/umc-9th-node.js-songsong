@@ -1,109 +1,71 @@
-export class DuplicateUserEmailError extends Error{
+class BaseError extends Error{
+    reason: string;
+    data: Record<string,any>;
+    statusCode: number;
+    errorCode: string;
 
-    reason: string
-    data: Record<string,any>
-    errorCode = "U001";
-    
-    constructor(reason:string, data:Record<string, any>){
+    constructor(reason:string, data:Record<string, any>, statusCode=400, errorCode="UNKNOWN"){
         super(reason);
         this.reason=reason;
         this.data=data;
+        this.statusCode=statusCode;
+        this.errorCode=errorCode;
     }
 }
 
-export class HasNotJoinedMissionError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "RV001";
-    
+export class DuplicateUserEmailError extends BaseError{
+
+   constructor(reason:string, data:Record<string, any>){
+    super(reason, data, 400, "U001");
+   }
+}
+
+export class HasNotJoinedMissionError extends BaseError{
+   constructor(reason:string, data:Record<string, any>){
+    super(reason, data, 400, "RV001");
+   }
+}
+
+export class HasNotFinishedMissionError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "RV002");
+   }
 }
 
-export class HasNotFinishedMissionError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "RV002";
-    
+export class RestarantNotAddedError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "RS001");
+   }
 }
 
-export class RestarantNotAddedError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "RS001";
-    
+export class MissionAlreadyChallengedError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "M001");
+   }
 }
 
-export class MissionAlreadyChallengedError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "M001";
-    
+export class ReviewNotExistError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "M002");
+   }
 }
 
-export class ReviewNotExistError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "M002";
-    
+
+export class MissionAlreadyFinishedError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "M003");
+   }
 }
 
-
-export class MissionAlreadyFinishedError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "M003";
-    
+export class UndefinedMissionStatusError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "M004");
+   }
 }
 
-export class UndefinedMissionStatusError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "M004";
-    
+export class MissionNotExistError extends BaseError{
     constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
+    super(reason, data, 400, "M005");
+   }
 }
 
-export class MissionNotExistError extends Error{
-    reason: string
-    data: Record<string,any>
-    errorCode = "M005";
-    
-    constructor(reason:string, data:Record<string, any>){
-        super(reason);
-        this.reason=reason;
-        this.data=data;
-    }
-}

@@ -25,5 +25,5 @@ export const bodyToMissionStatus=(body:Record<string, any>)=>{
 }
 
 export const responseFromChangedMission=(body:Record<string, any>)=>{
-    return body;
+    return body
 }

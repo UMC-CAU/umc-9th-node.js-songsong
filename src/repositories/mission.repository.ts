@@ -71,7 +71,7 @@ export const getMissionsByRestaurantId = async(id:number, cursor:number)=>{
 }
 
 export const alterMissionStatus = async(userId:number, missionId:number, changedStatus:Record<string, any>)=>{
-  await prisma.missionStatus.updateMany({
+  const result=await prisma.missionStatus.updateMany({
     where:{
       userId:BigInt(userId),
       missionId:BigInt(missionId)
@@ -80,6 +80,7 @@ export const alterMissionStatus = async(userId:number, missionId:number, changed
       status:changedStatus.status as any
     }
   })
+  console.log(`result is${result}`);
 }
 
 export const getMission = async(userId:number, missionId:number)=>{
