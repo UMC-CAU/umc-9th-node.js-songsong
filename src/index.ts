@@ -11,12 +11,44 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
+import passport from 'passport'
+import { googleStrategy, jwtStrategy } from './auth.config.js'
 
 
 
 dotenv.config()
 
+passport.use(googleStrategy)
+passport.use(jwtStrategy)
+
 const app = express()
+
+function convertBigInt(obj: any) {
+  return JSON.parse(JSON.stringify(obj, (_, v) =>
+    typeof v === "bigint" ? v.toString() : v
+  ));
+}
+
+
+/*
+ * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
+ */
+app.use((req : Request, res: Response, next: NextFunction) => {
+  (res as any).success = (success:any) => {
+    return res.json({ resultType: "SUCCESS", error: null, success:convertBigInt(success) });
+  };
+
+  (res as any).error = ({ errorCode = "unknown", reason = null, data = null }) => {
+    return res.json({
+      resultType: "FAIL",
+      error: convertBigInt({ errorCode, reason, data }),
+      success: null,
+    });
+  };
+
+  next();
+}); 
+
 const port: number = 3000;
 
 
@@ -26,6 +58,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(morgan('dev'))
 app.use(cookieParser())
+app.use(passport.initialize())
+
+
+
 
 app.use(
   "/docs",
@@ -35,6 +71,27 @@ app.use(
       url: "/openapi.json",
     },
   })
+);
+
+app.get("/oauth2/login/google", 
+  passport.authenticate("google", { 
+    session: false 
+  })
+);
+app.get(
+  "/oauth2/callback/google",
+  passport.authenticate("google", {
+	  session: false,
+    failureRedirect: "/login-failed",
+  }),
+  (req, res) => {
+    const tokens = req.user; 
+
+    (res as any).success({
+      message: "구글 로그인 성공",
+      tokens,
+    });
+  }
 );
 
 app.get("/openapi.json", async (req, res, next) => {
@@ -58,29 +115,21 @@ app.get("/openapi.json", async (req, res, next) => {
   res.json(result ? result.data : null);
 });
 
-/*
- * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
- */
-app.use((req : Request, res: Response, next: NextFunction) => {
-  (res as any).success = (success:any) => {
-    return res.json({ resultType: "SUCCESS", error: null, success });
-  };
 
-  (res as any).error = ({ errorCode = "unknown", reason = null, data = null }) => {
-    return res.json({
-      resultType: "FAIL",
-      error: { errorCode, reason, data },
-      success: null,
-    });
-  };
 
-  next();
-});
 
 app.get('/', (req: Request, res: Response): void => {
   //#swagger.ignore=true
   res.send('Hello World!')
 })
+const isLogin = passport.authenticate('jwt', { session: false });
+
+app.get('/mypage', isLogin, (req: Record<string, any>, res: Response) => {
+  (res as any).status(200).success({
+    message: `인증 성공! ${req.user.name}님의 마이페이지입니다.`,
+    user: req.user,
+  });
+});
 
 
 app.post("/api/v1/users/signup", handleUserSignUp)
