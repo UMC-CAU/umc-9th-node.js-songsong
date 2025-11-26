@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { bodyToUser } from "../dtos/user.dto.js";
-import { userSignUp, listUserReviews } from "../services/user.service.js";
+import { bodyToUser, modifyBodyToUser } from "../dtos/user.dto.js";
+import { userSignUp, listUserReviews, modifyUserInfo } from "../services/user.service.js";
 import type {Response, Request, NextFunction} from "express";
 
 export const handleUserSignUp = async (req:Request, res:Response, next:NextFunction) => {
@@ -152,4 +152,22 @@ export const handleListUserReviews = async(req:Request, res:Response, next:NextF
     );
     (res as any).status(StatusCodes.OK).success(reviews);
       
+}
+
+
+
+export const handleModifyUserInfo = async(req:Record<string, any>, res:Response, next:NextFunction)=>{
+  console.log("유저 정보 수정을 요청했습니다.");
+  if (!req.user) {
+   return next(new Error("userId가 없습니다."));
+  }
+
+  else{
+
+    const userId = req.user.id;
+    console.log("수정할 유저 ID:", userId);
+    const updatedInfo = await modifyUserInfo(modifyBodyToUser(req.body), userId);
+
+    (res as any).status(StatusCodes.OK).success(updatedInfo);
+  }
 }

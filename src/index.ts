@@ -2,7 +2,7 @@
 import express from 'express'          // -> ES Module
 import dotenv from "dotenv"
 import cors from "cors" //이 부분은 워크북에 안 나와 있는데 추가해야 제대로 실행된다.
-import {handleUserSignUp, handleListUserReviews} from "../src/controllers/user.controller.js" //이 부분도 추가해줘야 실행된다.
+import {handleUserSignUp, handleListUserReviews, handleModifyUserInfo} from "../src/controllers/user.controller.js" //이 부분도 추가해줘야 실행된다.
 import {handleCreateReview} from "../src/controllers/review.controller.js"
 import {handleCreateChallenge, handleChangeMissionStatus} from "../src/controllers/mission.controller.js"
 import {handleCreateRestaurant, handleListRestaurantReviews, handleListRestaurantMissions} from "../src/controllers/restaurant.controller.js"
@@ -132,14 +132,17 @@ app.get('/mypage', isLogin, (req: Record<string, any>, res: Response) => {
 });
 
 
-app.post("/api/v1/users/signup", handleUserSignUp)
-app.post("/api/v1/missions/:missionId/reviews", handleCreateReview)
-app.post("/api/v1/missions/:missionId/challenges", handleCreateChallenge)
-app.post("/api/v1/districts/:districtId/restaurants", handleCreateRestaurant)
-app.get("/api/v1/restaurants/:restaurantId/reviews", handleListRestaurantReviews)
-app.get("/api/v1/users/:userId/reviews", handleListUserReviews)
-app.get("/api/v1/restaurants/:restaurantId/missions", handleListRestaurantMissions)
-app.patch("/api/v1/users/:userId/missions/:missionId/status", handleChangeMissionStatus)
+app.post("/api/v1/users/signup", isLogin, handleUserSignUp)
+app.post("/api/v1/missions/:missionId/reviews", isLogin, handleCreateReview) // 로그인 필요
+app.post("/api/v1/missions/:missionId/challenges", isLogin, handleCreateChallenge) // 로그인 필요
+app.post("/api/v1/districts/:districtId/restaurants", isLogin, handleCreateRestaurant) // 로그인 필요
+app.get("/api/v1/restaurants/:restaurantId/reviews", isLogin, handleListRestaurantReviews) // 로그인 필요
+app.get("/api/v1/users/:userId/reviews", isLogin, handleListUserReviews) // 로그인 필요
+app.get("/api/v1/restaurants/:restaurantId/missions", isLogin, handleListRestaurantMissions) // 로그인 필요
+app.patch("/api/v1/users/:userId/missions/:missionId/status", isLogin, handleChangeMissionStatus) // 로그인 필요
+
+// 자기 정보 수정 api 만들기
+app.patch("/api/v1/users/me", isLogin, handleModifyUserInfo) // 로그인 필요
 
 /**
  * 전역 오류를 처리하기 위한 미들웨어

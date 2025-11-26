@@ -36,3 +36,19 @@ export const responseFromUserReviews=(reviews:Record<string, any>)=>{
     },
   }
 }
+
+export const modifyBodyToUser = (body:Record<string, any>) => {
+  console.log("modifyBodyToUser에 도달했습니다.");
+
+
+  return {
+    name: body.name || "",// 선택
+    gender: body.gender || "", // 선택
+    birth: body.birth ? new Date(body.birth) || "" : "", // 선택
+    address: body.address || "", //선택 
+    detailAddress: body.detailAddress || "", //선택 
+    phoneNumber: body.phoneNumber || "",//선택
+    preferences: body.preferences || "",// 선택 
+    password: body.password || "", //일단 비밀번호는 선택으로..
+  };
+}
