@@ -8,7 +8,7 @@ import {
   getUserReviews
 } from "../repositories/user.repository.js";
 import bcrypt from "bcrypt";
-import {DuplicateUserEmailError, ReviewNotExistError} from "../errors.ts"
+import {DuplicateUserEmailError, ReviewNotExistError} from "../errors.js"
 
 export const userSignUp = async (data) => {
 
