@@ -2,10 +2,10 @@
 import express from 'express'          // -> ES Module
 import dotenv from "dotenv"
 import cors from "cors" //이 부분은 워크북에 안 나와 있는데 추가해야 제대로 실행된다.
-import {handleUserSignUp, handleListUserReviews, handleModifyUserInfo} from "../src/controllers/user.controller.js" //이 부분도 추가해줘야 실행된다.
-import {handleCreateReview} from "../src/controllers/review.controller.js"
-import {handleCreateChallenge, handleChangeMissionStatus} from "../src/controllers/mission.controller.js"
-import {handleCreateRestaurant, handleListRestaurantReviews, handleListRestaurantMissions} from "../src/controllers/restaurant.controller.js"
+import {handleUserSignUp, handleListUserReviews, handleModifyUserInfo} from "./controllers/user.controller.js" //이 부분도 추가해줘야 실행된다.
+import {handleCreateReview} from "./controllers/review.controller.js"
+import {handleCreateChallenge, handleChangeMissionStatus} from "./controllers/mission.controller.js"
+import {handleCreateRestaurant, handleListRestaurantReviews, handleListRestaurantMissions} from "./controllers/restaurant.controller.js"
 import type { NextFunction, Request, Response, } from "express"
 import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
