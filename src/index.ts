@@ -2,7 +2,7 @@
 import express from 'express'          // -> ES Module
 import dotenv from "dotenv"
 import cors from "cors" //이 부분은 워크북에 안 나와 있는데 추가해야 제대로 실행된다.
-import {handleUserSignUp, handleListUserReviews} from "./controllers/user.controller.js" //이 부분도 추가해줘야 실행된다.
+import {handleUserSignUp, handleListUserReviews, handleModifyUserInfo} from "./controllers/user.controller.js" //이 부분도 추가해줘야 실행된다.
 import {handleCreateReview} from "./controllers/review.controller.js"
 import {handleCreateChallenge, handleChangeMissionStatus} from "./controllers/mission.controller.js"
 import {handleCreateRestaurant, handleListRestaurantReviews, handleListRestaurantMissions} from "./controllers/restaurant.controller.js"
@@ -11,12 +11,44 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
+import passport from 'passport'
+import { googleStrategy, jwtStrategy } from './auth.config.js'
 
 
 
 dotenv.config()
 
+passport.use(googleStrategy)
+passport.use(jwtStrategy)
+
 const app = express()
+
+function convertBigInt(obj: any) {
+  return JSON.parse(JSON.stringify(obj, (_, v) =>
+    typeof v === "bigint" ? v.toString() : v
+  ));
+}
+
+
+/*
+ * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
+ */
+app.use((req : Request, res: Response, next: NextFunction) => {
+  (res as any).success = (success:any) => {
+    return res.json({ resultType: "SUCCESS", error: null, success:convertBigInt(success) });
+  };
+
+  (res as any).error = ({ errorCode = "unknown", reason = null, data = null }) => {
+    return res.json({
+      resultType: "FAIL",
+      error: convertBigInt({ errorCode, reason, data }),
+      success: null,
+    });
+  };
+
+  next();
+}); 
+
 const port: number = 3000;
 
 
@@ -26,6 +58,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(morgan('dev'))
 app.use(cookieParser())
+app.use(passport.initialize())
+
+
+
 
 app.use(
   "/docs",
@@ -35,6 +71,27 @@ app.use(
       url: "/openapi.json",
     },
   })
+);
+
+app.get("/oauth2/login/google", 
+  passport.authenticate("google", { 
+    session: false 
+  })
+);
+app.get(
+  "/oauth2/callback/google",
+  passport.authenticate("google", {
+	  session: false,
+    failureRedirect: "/login-failed",
+  }),
+  (req, res) => {
+    const tokens = req.user; 
+
+    (res as any).success({
+      message: "구글 로그인 성공",
+      tokens,
+    });
+  }
 );
 
 app.get("/openapi.json", async (req, res, next) => {
@@ -58,39 +115,34 @@ app.get("/openapi.json", async (req, res, next) => {
   res.json(result ? result.data : null);
 });
 
-/*
- * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
- */
-app.use((req : Request, res: Response, next: NextFunction) => {
-  (res as any).success = (success:any) => {
-    return res.json({ resultType: "SUCCESS", error: null, success });
-  };
 
-  (res as any).error = ({ errorCode = "unknown", reason = null, data = null }) => {
-    return res.json({
-      resultType: "FAIL",
-      error: { errorCode, reason, data },
-      success: null,
-    });
-  };
 
-  next();
-});
 
 app.get('/', (req: Request, res: Response): void => {
   //#swagger.ignore=true
   res.send('Hello World!')
 })
+const isLogin = passport.authenticate('jwt', { session: false });
+
+app.get('/mypage', isLogin, (req: Record<string, any>, res: Response) => {
+  (res as any).status(200).success({
+    message: `인증 성공! ${req.user.name}님의 마이페이지입니다.`,
+    user: req.user,
+  });
+});
 
 
-app.post("/api/v1/users/signup", handleUserSignUp)
-app.post("/api/v1/missions/:missionId/reviews", handleCreateReview)
-app.post("/api/v1/missions/:missionId/challenges", handleCreateChallenge)
-app.post("/api/v1/districts/:districtId/restaurants", handleCreateRestaurant)
-app.get("/api/v1/restaurants/:restaurantId/reviews", handleListRestaurantReviews)
-app.get("/api/v1/users/:userId/reviews", handleListUserReviews)
-app.get("/api/v1/restaurants/:restaurantId/missions", handleListRestaurantMissions)
-app.patch("/api/v1/users/:userId/missions/:missionId/status", handleChangeMissionStatus)
+app.post("/api/v1/users/signup", isLogin, handleUserSignUp)
+app.post("/api/v1/missions/:missionId/reviews", isLogin, handleCreateReview) // 로그인 필요
+app.post("/api/v1/missions/:missionId/challenges", isLogin, handleCreateChallenge) // 로그인 필요
+app.post("/api/v1/districts/:districtId/restaurants", isLogin, handleCreateRestaurant) // 로그인 필요
+app.get("/api/v1/restaurants/:restaurantId/reviews", isLogin, handleListRestaurantReviews) // 로그인 필요
+app.get("/api/v1/users/:userId/reviews", isLogin, handleListUserReviews) // 로그인 필요
+app.get("/api/v1/restaurants/:restaurantId/missions", isLogin, handleListRestaurantMissions) // 로그인 필요
+app.patch("/api/v1/users/:userId/missions/:missionId/status", isLogin, handleChangeMissionStatus) // 로그인 필요
+
+// 자기 정보 수정 api 만들기
+app.patch("/api/v1/users/me", isLogin, handleModifyUserInfo) // 로그인 필요
 
 /**
  * 전역 오류를 처리하기 위한 미들웨어
